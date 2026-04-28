@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 /**
  * @author muhammad.khadafi
@@ -46,16 +45,14 @@ public class StudentService {
         return result.toString();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Student> findStudentWithHighestGpa() {
         return studentRepository.findTopByOrderByGpaDesc();
     }
 
+    @Transactional(readOnly = true)
     public String joinStudentNames() {
-        StringJoiner joinedNames = new StringJoiner(", ");
-        for (String studentName : studentRepository.findAllNames()) {
-            joinedNames.add(studentName);
-        }
-        return joinedNames.toString();
+        return studentRepository.findJoinedNames();
     }
 }
 

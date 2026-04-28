@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,6 +14,6 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findTopByOrderByGpaDesc();
 
-    @Query("select s.name from Student s")
-    List<String> findAllNames();
+    @Query(value = "select coalesce(string_agg(name, ', ' order by id), '') from students", nativeQuery = true)
+    String findJoinedNames();
 }
