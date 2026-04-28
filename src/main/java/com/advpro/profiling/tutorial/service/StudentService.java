@@ -1,7 +1,7 @@
 package com.advpro.profiling.tutorial.service;
 
 import com.advpro.profiling.tutorial.dto.StudentCourseSummary;
-import com.advpro.profiling.tutorial.model.Student;
+import com.advpro.profiling.tutorial.dto.StudentSummary;
 import com.advpro.profiling.tutorial.repository.StudentCourseRepository;
 import com.advpro.profiling.tutorial.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +46,25 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Student> findStudentWithHighestGpa() {
-        return studentRepository.findTopByOrderByGpaDesc();
+    public String findStudentWithHighestGpa() {
+        return studentRepository.findFirstByOrderByGpaDesc()
+                .map(this::formatStudent)
+                .orElse("");
     }
 
     @Transactional(readOnly = true)
     public String joinStudentNames() {
         return studentRepository.findJoinedNames();
+    }
+
+    private String formatStudent(StudentSummary student) {
+        return "Student{" +
+                "id=" + student.getId() +
+                ", studentCode='" + student.getStudentCode() + '\'' +
+                ", name='" + student.getName() + '\'' +
+                ", faculty='" + student.getFaculty() + '\'' +
+                ", gpa=" + student.getGpa() +
+                '}';
     }
 }
 
