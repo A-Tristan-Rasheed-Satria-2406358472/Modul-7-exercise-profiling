@@ -1,15 +1,16 @@
 package com.advpro.profiling.tutorial.service;
 
+import com.advpro.profiling.tutorial.dto.StudentCourseSummary;
 import com.advpro.profiling.tutorial.model.Student;
-import com.advpro.profiling.tutorial.model.StudentCourse;
 import com.advpro.profiling.tutorial.repository.StudentCourseRepository;
 import com.advpro.profiling.tutorial.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 /**
  * @author muhammad.khadafi
@@ -23,41 +24,38 @@ public class StudentService {
     @Autowired
     private StudentCourseRepository studentCourseRepository;
 
-    public List<StudentCourse> getAllStudentsWithCourses() {
-        List<Student> students = studentRepository.findAll();
-        List<StudentCourse> studentCourses = new ArrayList<>();
-        for (Student student : students) {
-            List<StudentCourse> studentCoursesByStudent = studentCourseRepository.findByStudentId(student.getId());
-            for (StudentCourse studentCourseByStudent : studentCoursesByStudent) {
-                StudentCourse studentCourse = new StudentCourse();
-                studentCourse.setStudent(student);
-                studentCourse.setCourse(studentCourseByStudent.getCourse());
-                studentCourses.add(studentCourse);
+    @Transactional(readOnly = true)
+    public String getAllStudentsWithCourses() {
+        List<StudentCourseSummary> studentCourses = studentCourseRepository.findAllStudentCourseSummaries();
+        StringBuilder result = new StringBuilder(studentCourses.size() * 80);
+
+        result.append("[");
+        for (int i = 0; i < studentCourses.size(); i++) {
+            StudentCourseSummary studentCourse = studentCourses.get(i);
+            if (i > 0) {
+                result.append(", ");
             }
+            result.append("StudentCourse{, student=")
+                    .append(studentCourse.studentName())
+                    .append(", course=")
+                    .append(studentCourse.courseName())
+                    .append("}\n");
         }
-        return studentCourses;
+        result.append("]");
+
+        return result.toString();
     }
 
     public Optional<Student> findStudentWithHighestGpa() {
-        List<Student> students = studentRepository.findAll();
-        Student highestGpaStudent = null;
-        double highestGpa = 0.0;
-        for (Student student : students) {
-            if (student.getGpa() > highestGpa) {
-                highestGpa = student.getGpa();
-                highestGpaStudent = student;
-            }
-        }
-        return Optional.ofNullable(highestGpaStudent);
+        return studentRepository.findTopByOrderByGpaDesc();
     }
 
     public String joinStudentNames() {
-        List<Student> students = studentRepository.findAll();
-        String result = "";
-        for (Student student : students) {
-            result += student.getName() + ", ";
+        StringJoiner joinedNames = new StringJoiner(", ");
+        for (String studentName : studentRepository.findAllNames()) {
+            joinedNames.add(studentName);
         }
-        return result.substring(0, result.length() - 2);
+        return joinedNames.toString();
     }
 }
 
