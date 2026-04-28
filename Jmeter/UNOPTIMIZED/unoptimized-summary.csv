@@ -1,0 +1,4 @@
+Endpoint,Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Avg. Bytes
+/all-student,10,78190 ms,77412 ms,79414 ms,539.54,0.000%,0.12538/sec,1991306.0
+/all-student-name,10,1995 ms,1590 ms,2198 ms,183.99,0.000%,3.71609/sec,227133.0
+/highest-gpa,10,142 ms,93 ms,209 ms,38.81,0.000%,10.90513/sec,269.0
